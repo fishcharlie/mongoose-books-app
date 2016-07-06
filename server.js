@@ -81,6 +81,27 @@ app.post('/api/books', function (req, res) {
   });
 });
 
+// Create a character associated with a book
+app.post('/api/books/:book_id/characters', function (req, res) {
+  // Get book id from url params (`req.params`)
+  var bookId = req.params.book_id;
+  db.Book.findById(bookId)
+    .populate('author')
+    .exec(function(err, foundBook) {
+      if (err) {
+        return console.log("error adding character " + err);
+      }
+      // push req.body into characters array
+      foundBook.characters.push(req.body);
+      // save the book with the new character
+      foundBook.save();
+      // send the entire book back
+      res.json(foundBook);
+    }
+  );
+});
+
+
 // delete book
 app.delete('/api/books/:id', function (req, res) {
   // get book id from url params (`req.params`)
